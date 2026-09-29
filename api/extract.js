@@ -31,11 +31,14 @@ iq: تاريخ انتهاء الإقامة بصيغة YYYY-MM-DD، فقط إذا
     process.env.GEMINI_MODEL,
     'gemini-3.8-flash',
     'gemini-3.6-flash',
-    'gemini-2.5-flash'
+    'gemini-3.5-flash',
+    'gemini-3.1-flash-lite'
   ].filter(Boolean))];
+  const errors = [];
 
   const started = Date.now();
   let lastErr = 'فشل الاتصال بـ Gemini';
+  const note = (model, st, msg) => errors.push(model + ' [' + st + ']: ' + String(msg || '').slice(0, 90));
 
   for (const model of models) {
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -62,8 +65,9 @@ iq: تاريخ انتهاء الإقامة بصيغة YYYY-MM-DD، فقط إذا
         }
 
         lastErr = (j.error && j.error.message) || lastErr;
+        note(model, r.status, lastErr);
         // ضغط أو خطأ مؤقت: أعد المحاولة بعد ثانيتين ثم انتقل للموديل التالي
-        if (r.status === 503 || r.status === 429 || r.status === 500) { await sleep(2000); continue; }
+        if (r.status === 503 || r.status === 429 || r.status === 500) { await sleep(3000); continue; }
         // موديل غير موجود أو غير متاح لحسابك: انتقل للتالي مباشرة
         if (r.status === 404 || r.status === 400) break;
         // مفتاح خاطئ أو ممنوع: لا فائدة من التكرار
@@ -74,7 +78,7 @@ iq: تاريخ انتهاء الإقامة بصيغة YYYY-MM-DD، فقط إذا
       }
     }
   }
-  res.status(502).json({ error: 'تعذّرت القراءة: ' + lastErr });
+  res.status(502).json({ error: 'تعذّرت القراءة. ' + (errors.join(' | ') || lastErr) });
 };
 
 module.exports.config = { maxDuration: 60 };
