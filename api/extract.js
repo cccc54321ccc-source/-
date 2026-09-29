@@ -1,84 +1,90 @@
-// Vercel Serverless Function: يقرأ الملف عبر Gemini. المفتاح يبقى في Vercel ولا يظهر للمتصفح.
-// نسخة مقاومة للضغط: تعيد المحاولة وتنتقل لموديل احتياطي عند خطأ 503 / 429 / 404.
+// Vercel Serverless Function: يقرأ الملف عبر OpenRouter (مفتاح واحد لعدة موديلات).
+// المتغيرات في Vercel: OPENROUTER_API_KEY  (اختياري: OPENROUTER_MODEL, ACCESS_CODE)
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+const PROMPT = `اقرأ هذا المستند الخاص بموظف (عقد عمل موحد أو إقامة أو شهادة صحية) وأعد JSON فقط بدون أي شرح أو علامات ماركداون، بهذه المفاتيح.
+ضع null لأي قيمة غير موجودة أو غير واضحة ولا تخمّن.
+تنبيه مهم: في عقد العمل الموحد يوجد شخصان: "الطرف الأول" (صاحب العمل) وممثله، و"الطرف الثاني" (العامل).
+كل البيانات المطلوبة عن العامل (الطرف الثاني) فقط، ولا تأخذ اسم أو رقم هوية الممثل أو صاحب العمل.
+التواريخ قد تكون بصيغة 2027/08/08 حوّلها إلى YYYY-MM-DD.
+المفاتيح:
+docType: contract أو iqama أو health أو other
+n: اسم الموظف (الطرف الثاني/العامل) بالعربية كما في المستند
+nat: جنسية الموظف كاسم دولة بالعربية (مثل مصر، الهند، باكستان)
+idn: رقم هوية/إقامة الموظف وليس رقم الممثل
+job: المسمى الوظيفي بالعربية
+co: اسم المنشأة (صاحب العمل) بالعربية
+ce: تاريخ نهاية العقد (Contract end date) بصيغة YYYY-MM-DD
+iq: تاريخ انتهاء الإقامة بصيغة YYYY-MM-DD فقط إذا ذُكر صراحة (عقد العمل لا يحتويه عادة، فاجعله null)`;
 
 module.exports = async (req, res) => {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) return res.status(500).json({ error: 'أضف GEMINI_API_KEY في إعدادات Vercel' });
+  const key = process.env.OPENROUTER_API_KEY;
+  if (!key) return res.status(500).json({ error: 'أضف OPENROUTER_API_KEY في إعدادات Vercel' });
   if (process.env.ACCESS_CODE && req.headers['x-code'] !== process.env.ACCESS_CODE)
     return res.status(401).json({ error: 'رمز الدخول غير صحيح' });
   const { mime, data } = req.body || {};
   if (!mime || !data) return res.status(400).json({ error: 'ملف غير صالح' });
 
-  const prompt = `اقرأ هذا المستند الخاص بموظف (عقد عمل موحد أو إقامة أو شهادة صحية) وأعد JSON فقط بهذه المفاتيح.
-ضع null لأي قيمة غير موجودة أو غير واضحة ولا تخمّن.
-تنبيه مهم: في عقد العمل الموحد يوجد شخصان: "الطرف الأول" (صاحب العمل) وممثله، و"الطرف الثاني" (العامل).
-كل البيانات المطلوبة عن العامل (الطرف الثاني) فقط، ولا تأخذ اسم أو رقم هوية الممثل أو صاحب العمل.
-التواريخ في المستند قد تكون بصيغة 2027/08/08 حوّلها إلى YYYY-MM-DD.
-المفاتيح:
-docType: contract أو iqama أو health أو other
-n: اسم الموظف (الطرف الثاني / العامل) بالعربية كما هو مكتوب في المستند
-nat: جنسية الموظف كاسم دولة بالعربية (مثل مصر، الهند، باكستان)
-idn: رقم هوية/إقامة الموظف (الطرف الثاني) وليس رقم الممثل
-job: المسمى الوظيفي بالعربية
-co: اسم المنشأة (صاحب العمل) بالعربية
-ce: تاريخ نهاية العقد (Contract end date) بصيغة YYYY-MM-DD
-iq: تاريخ انتهاء الإقامة بصيغة YYYY-MM-DD، فقط إذا ذُكر صراحة (عقد العمل لا يحتوي عادة على هذا التاريخ، فاجعله null)`;
+  const isPdf = mime === 'application/pdf';
+  const dataUrl = `data:${mime};base64,${data}`;
+  const filePart = isPdf
+    ? { type: 'file', file: { filename: 'document.pdf', file_data: dataUrl } }
+    : { type: 'image_url', image_url: { url: dataUrl } };
 
-  // الترتيب: الموديل المحدد في Vercel أولاً ثم بدائل
+  // الأول هو الأساسي، والباقي احتياطي إذا فشل أو كان مضغوطاً
   const models = [...new Set([
-    process.env.GEMINI_MODEL,
-    'gemini-3.8-flash',
-    'gemini-3.6-flash',
-    'gemini-3.5-flash',
-    'gemini-3.1-flash-lite'
+    process.env.OPENROUTER_MODEL,
+    'anthropic/claude-haiku-4.5',
+    'google/gemini-3.6-flash'
   ].filter(Boolean))];
-  const errors = [];
 
   const started = Date.now();
-  let lastErr = 'فشل الاتصال بـ Gemini';
-  const note = (model, st, msg) => errors.push(model + ' [' + st + ']: ' + String(msg || '').slice(0, 90));
+  const errors = [];
 
   for (const model of models) {
     for (let attempt = 0; attempt < 2; attempt++) {
-      if (Date.now() - started > 50000) break; // لا نتجاوز مهلة الدالة
+      if (Date.now() - started > 50000) break;
       try {
-        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        const body = {
+          model,
+          temperature: 0,
+          max_tokens: 800,
+          messages: [{ role: 'user', content: [filePart, { type: 'text', text: PROMPT }] }]
+        };
+        // native: يرسل الـ PDF للموديل كما هو (مهم للعربي، لأن استخراج النص من هذي العقود العربية يطلع مشوّه)
+        if (isPdf) body.plugins = [{ id: 'file-parser', pdf: { engine: 'native' } }];
+
+        const r = await fetch('https://openrouter.ai/api/v1/chat/completions', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'x-goog-api-key': key },
-          body: JSON.stringify({
-            contents: [{ parts: [{ inline_data: { mime_type: mime, data } }, { text: prompt }] }],
-            generationConfig: { responseMimeType: 'application/json', temperature: 0 }
-          })
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + key },
+          body: JSON.stringify(body)
         });
         const j = await r.json().catch(() => ({}));
 
-        if (r.ok) {
-          const txt = (j.candidates?.[0]?.content?.parts || []).map(p => p.text || '').join('') || '{}';
-          try {
-            return res.status(200).json(JSON.parse(txt.replace(/```json|```/g, '').trim()));
-          } catch (e) {
-            lastErr = 'رد غير مفهوم من Gemini، أعد المحاولة';
-            continue;
+        if (r.ok && j.choices && j.choices[0]) {
+          const txt = String(j.choices[0].message?.content || '');
+          const m = txt.match(/\{[\s\S]*\}/);
+          if (m) {
+            try { return res.status(200).json(JSON.parse(m[0])); } catch (e) {}
           }
+          errors.push(model + ': رد غير مفهوم');
+          continue;
         }
 
-        lastErr = (j.error && j.error.message) || lastErr;
-        note(model, r.status, lastErr);
-        // ضغط أو خطأ مؤقت: أعد المحاولة بعد ثانيتين ثم انتقل للموديل التالي
-        if (r.status === 503 || r.status === 429 || r.status === 500) { await sleep(3000); continue; }
-        // موديل غير موجود أو غير متاح لحسابك: انتقل للتالي مباشرة
-        if (r.status === 404 || r.status === 400) break;
-        // مفتاح خاطئ أو ممنوع: لا فائدة من التكرار
-        if (r.status === 401 || r.status === 403) return res.status(502).json({ error: lastErr });
+        const msg = (j.error && (j.error.message || j.error.code)) || 'خطأ';
+        errors.push(model + ' [' + r.status + ']: ' + String(msg).slice(0, 90));
+        if ([429, 500, 502, 503, 529].includes(r.status)) { await sleep(2500); continue; }
+        if (r.status === 401 || r.status === 402) return res.status(502).json({ error: 'تعذّرت القراءة. ' + errors.join(' | ') });
+        break; // موديل غير موجود أو لا يدعم الملف: جرّب التالي
       } catch (e) {
-        lastErr = e.message;
+        errors.push(model + ': ' + e.message);
         await sleep(1000);
       }
     }
   }
-  res.status(502).json({ error: 'تعذّرت القراءة. ' + (errors.join(' | ') || lastErr) });
+  res.status(502).json({ error: 'تعذّرت القراءة. ' + (errors.join(' | ') || 'فشل الاتصال') });
 };
 
 module.exports.config = { maxDuration: 60 };
