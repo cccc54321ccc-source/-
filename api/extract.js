@@ -11,6 +11,7 @@ const PROMPT = `هذا مستند خاص بموظف (عقد عمل موحد أو
 كل البيانات المطلوبة عن العامل (الطرف الثاني) فقط، ولا تأخذ اسم أو رقم هوية الممثل أو صاحب العمل.
 التواريخ قد تكون بصيغة 2027/08/08 حوّلها إلى YYYY-MM-DD.
 تاريخ نهاية العقد هو Contract end date وليس تاريخ البداية.
+الجوال والبريد الإلكتروني: للعامل (الطرف الثاني) فقط.
 تاريخ انتهاء الإقامة: فقط إذا ذُكر صراحة (عقد العمل لا يحتويه عادة، فاتركه "").`;
 
 const FIELDS = {
@@ -21,7 +22,14 @@ const FIELDS = {
   job: 'المسمى الوظيفي بالعربية',
   co: 'اسم المنشأة (صاحب العمل) بالعربية',
   ce: 'تاريخ نهاية العقد بصيغة YYYY-MM-DD',
-  iq: 'تاريخ انتهاء الإقامة بصيغة YYYY-MM-DD فقط إذا ذُكر صراحة'
+  iq: 'تاريخ انتهاء الإقامة بصيغة YYYY-MM-DD فقط إذا ذُكر صراحة',
+  msd: 'تاريخ مباشرة العمل (Commencement date) بصيغة YYYY-MM-DD',
+  cs: 'تاريخ بداية العقد الحالي (Starting date) بصيغة YYYY-MM-DD',
+  cn: 'رقم العقد (Contract number)',
+  wc: 'مدينة/مكان العمل (Work location) بالعربية',
+  ph: 'رقم جوال الموظف (الطرف الثاني) فقط، وليس جوال المنشأة',
+  em: 'البريد الإلكتروني للموظف (الطرف الثاني) فقط، وليس بريد المنشأة',
+  al: 'عدد أيام الإجازة السنوية كرقم فقط'
 };
 
 const SCHEMA = {
@@ -45,7 +53,13 @@ function clean(o) {
     docType: ['contract', 'iqama', 'health', 'other'].includes(dt) ? dt : 'other',
     n: s(o.n), nat: s(o.nat),
     idn: s(o.idn) ? String(o.idn).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '') || null : null,
-    job: s(o.job), co: s(o.co), ce: date(o.ce), iq: date(o.iq)
+    job: s(o.job), co: s(o.co), ce: date(o.ce), iq: date(o.iq),
+    msd: date(o.msd), cs: date(o.cs),
+    cn: s(o.cn) ? String(o.cn).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '') || null : null,
+    wc: s(o.wc),
+    ph: s(o.ph) ? String(o.ph).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^\d+]/g, '') || null : null,
+    em: s(o.em) ? String(o.em).toLowerCase() : null,
+    al: parseInt(String(o.al || '').replace(/\D/g, ''), 10) || null
   };
 }
 
