@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة الموظفين الذكية</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f4ee;--card:#fbfaf7;--bd:#e7e2d8;--ink:#1b2e3d;--mut:#6b7a85;--pri:#38796f;--soft:#e3edeb;--side:#1b2e3d;--side2:#293d4f}
+*{box-sizing:border-box;margin:0}
+body{font-family:'IBM Plex Sans Arabic',system-ui,sans-serif;background:var(--bg);color:var(--ink);font-size:14px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.app{display:grid;grid-template-columns:264px 1fr;min-height:100vh}
+aside{background:var(--side);color:#fff;padding:28px 18px 20px;display:flex;flex-direction:column;position:sticky;top:0;height:100vh}
+.logo{display:flex;align-items:center;gap:12px;margin-bottom:46px}
+.lg{width:42px;height:42px;border-radius:13px;background:#3a8b7f;display:grid;place-items:center;box-shadow:0 6px 18px #3a8b7f55}
+.logo b{font-size:19px;display:block}.logo small{color:#8fa3b0;font-size:12px}
+nav{display:flex;flex-direction:column;gap:7px;flex:1}
+nav button{display:flex;align-items:center;gap:12px;height:44px;padding:0 16px;border:0;border-radius:14px;background:none;color:#b9c6cf;font-size:15px;font-weight:500;text-align:right}
+nav button.on{background:var(--side2);color:#fff;border-inline-start:3px solid #4fb3a3;padding-inline-start:13px}
+nav button.on svg{color:#4fb3a3}
+.ws{border-top:1px solid #2e4355;padding-top:20px}
+.ws div{background:var(--side2);border-radius:16px;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.ws i{width:33px;height:33px;border-radius:10px;background:#4fb8a5;color:var(--side);display:grid;place-items:center;font-style:normal;font-weight:700}
+.ws small{display:block;color:#8fa3b0;font-size:12px}
+.ws b{font-size:15px}
+header{height:78px;border-bottom:1px solid var(--bd);padding:0 48px;display:flex;align-items:center;justify-content:space-between}
+.bc{font-size:14px;color:var(--mut)}.bc b{color:var(--ink);margin-inline-start:6px}.bc span{margin-inline-start:6px;opacity:.5}
+.hr{display:flex;align-items:center;gap:10px}
+.ib{width:38px;height:38px;border-radius:14px;border:1px solid var(--bd);background:var(--card);display:grid;place-items:center;color:var(--ink)}
+.us{display:flex;align-items:center;gap:10px;padding-inline-start:12px;margin-inline-start:4px;border-inline-start:1px solid var(--bd)}
+.us small{display:block;color:var(--mut);font-size:12px}
+.av{width:34px;height:34px;border-radius:11px;background:var(--pri);color:#fff;display:grid;place-items:center;font-weight:600;font-size:13px}
+main{padding:40px 48px 56px;max-width:1240px;width:100%;margin-inline:auto}
+.eb{color:var(--pri);font-size:14px;font-weight:500;margin-bottom:12px}
+h1{font-size:44px;font-weight:500;line-height:1.3;margin-bottom:10px}
+.sub{color:var(--mut);font-size:16px;margin-bottom:32px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:22px;box-shadow:0 8px 28px #1b2e3d0d}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px}
+.st{padding:18px;position:relative;overflow:hidden;min-height:133px}
+.st::after{content:'';position:absolute;left:0;bottom:-18px;width:64px;height:64px;border-radius:50%;background:#f5e7e1}
+.st .t{display:flex;justify-content:space-between;align-items:center;color:var(--ink);font-size:14px}
+.ico{width:31px;height:31px;border-radius:10px;background:#e5edf0;color:var(--pri);display:grid;place-items:center}
+.st .n{font-size:44px;font-weight:600;margin:6px 0 2px}.st small{color:var(--mut);font-size:12px}
+.g2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:16px}
+.p{padding:22px}
+h3{font-size:19px;font-weight:600}.mu{color:var(--mut)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.pill{background:var(--soft);color:var(--pri);border-radius:99px;padding:5px 12px;font-size:12px;display:inline-flex;gap:6px;align-items:center}
+.bar{display:flex;align-items:center;gap:14px;margin-top:22px}
+.bar span:first-child{width:90px;font-weight:500}.bar .tr{flex:1;height:7px;border-radius:9px;background:#ece8e1}
+.bar .tr i{display:block;height:100%;background:var(--pri);border-radius:9px}.bar span:last-child{width:34px;color:var(--mut);font-size:13px}
+.ct{background:linear-gradient(180deg,var(--card),#e9f2f0);display:flex;flex-direction:column;justify-content:center}
+.ct .big{font-size:96px;font-weight:600;color:var(--pri);line-height:1.1}
+.al{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--bd)}.al:last-child{border:0}
+.al>div{display:flex;align-items:center;gap:12px}.dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center}
+.dot i{width:11px;height:11px;border-radius:50%}
+.al a{color:var(--pri);font-size:13px}
+.tools{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
+.in{height:41px;border:1px solid var(--bd);background:var(--card);border-radius:20px;padding:0 16px;width:100%}
+.sr{display:flex;align-items:center;gap:10px;height:41px;border:1px solid var(--bd);background:var(--card);border-radius:20px;padding:0 16px;color:var(--mut)}
+.sr input{border:0;background:none;flex:1;outline:0;height:100%}
+select.in{appearance:none;background:var(--card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b7a85' stroke-width='2'%3E%3Cpath d='m7 15 5 5 5-5M7 9l5-5 5 5'/%3E%3C/svg%3E") no-repeat left 14px center}
+.chip{align-self:flex-start;height:40px;padding:0 18px;border:1px solid var(--bd);background:var(--card);border-radius:18px;display:flex;align-items:center;gap:8px}
+.chip.on{background:var(--pri);color:#fff}
+.md{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:640px}
+th{text-align:right;color:var(--mut);font-weight:400;font-size:12px;padding:0 18px;height:43px;border-bottom:1px solid var(--bd)}
+td{padding:0 18px;height:64px;border-bottom:1px solid var(--bd);white-space:nowrap;cursor:pointer}
+tr:last-child td{border:0}tr.sel td{background:#eef1f0}
+.emp{display:flex;align-items:center;gap:12px}.emp b{display:block;font-size:15px}.emp small{color:var(--mut);font-size:12px}
+.ea{width:31px;height:31px;border-radius:10px;background:#e5edf0;color:var(--pri);display:grid;place-items:center;font-weight:600;font-size:12px}
+.dh{display:flex;gap:12px;align-items:center;margin-bottom:26px;position:relative}
+.dh .av{width:48px;height:48px;border-radius:15px;font-size:20px}.dh b{font-size:20px;display:block}
+.dh .pill{position:absolute;left:0;top:0;font-size:11px;padding:3px 10px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;padding-bottom:22px;border-bottom:1px solid var(--bd);margin-bottom:20px}
+.dg small{color:var(--mut);font-size:12px;display:block}.dg b{font-size:15px}
+.nt{background:#f1efea;border-radius:12px;padding:12px;color:var(--mut);font-size:13px;margin:8px 0 18px}
+.btn{height:41px;border:1px solid var(--bd);background:var(--card);border-radius:14px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;font-weight:500}
+.btn.pr{background:var(--pri);color:#fff;border:0;width:auto;padding:0 24px;box-shadow:0 8px 18px #38796f44}
+.ig{display:grid;grid-template-columns:1fr 1.55fr;gap:16px}
+.dz{border:1.5px dashed #a9bdb8;background:#f4f3ef;border-radius:24px;padding:28px 20px;text-align:center;margin:24px 0 16px}
+.dz .ico{width:48px;height:48px;border-radius:15px;background:var(--soft);margin:0 auto 14px}
+.dz b{font-size:19px;display:block;margin-bottom:8px}.dz p{color:var(--mut);margin-bottom:16px;font-size:13px}
+.pv{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:379px;color:var(--mut);gap:8px}
+.pv b{font-size:19px;font-weight:500}
+.pi{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd);font-size:13px;text-align:right;width:100%}
+.pi span{flex:1}.lo{color:#d9784a}.hi{color:var(--pri)}
+.sec{padding:26px 0;border-bottom:1px solid var(--bd)}.sec:first-child{padding-top:0}
+.sec h3{font-size:20px}.sec>p{color:var(--mut);margin:4px 0 20px}
+.sec label{font-weight:600;display:block;margin-bottom:8px}
+.sec .in{max-width:640px;height:48px;font-size:15px}
+.tg{display:flex;flex-direction:row-reverse;justify-content:space-between;align-items:center;gap:16px}
+.tg small{color:var(--mut);display:block;font-size:13px;margin-top:4px}
+.sw{appearance:none;width:42px;height:24px;border-radius:99px;background:#cfd6d3;position:relative;flex:none}
+.sw::after{content:'';position:absolute;top:3px;right:3px;width:18px;height:18px;border-radius:50%;background:#fff;transition:.2s}
+.sw:checked{background:var(--pri)}.sw:checked::after{right:21px}
+.ft{display:flex;flex-direction:row-reverse;justify-content:space-between;align-items:center;padding-top:26px;color:var(--mut)}
+.ft span{display:flex;gap:8px;align-items:center}
+dialog{border:1px solid var(--bd);border-radius:22px;background:var(--card);padding:24px;width:min(420px,92vw);color:var(--ink)}
+dialog::backdrop{background:#1b2e3d88}
+dialog label{display:block;font-size:12px;color:var(--mut);margin:12px 0 4px}
+dialog .in{height:38px;border-radius:12px}dialog textarea.in{height:70px;padding:8px 12px}
+@media(max-width:1279px){.tools{display:flex}}
+@media(max-width:900px){.app{grid-template-columns:1fr}aside{position:static;height:auto;padding:14px}.logo{margin-bottom:12px}nav{flex-direction:row;overflow-x:auto}nav button{white-space:nowrap}.ws{display:none}
+header,main{padding-inline:18px}h1{font-size:32px}.stats,.g2,.md,.ig{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.us div{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside>
+ <div class="logo"><div class="lg" id="lg"></div><div><b>لوحة الموظفين</b><small>ذكاء تشغيلي للموارد البشرية</small></div></div>
+ <nav id="nav"></nav>
+ <div class="ws"><div><i id="wa">م</i><span><b id="wn"></b><small>مساحة العمل الرئيسية</small></span></div></div>
+</aside>
+<div>
+ <header>
+  <div class="bc">لوحة الموظفين الذكية <span>/</span><b id="crumb"></b></div>
+  <div class="hr"><button class="ib" id="hs"></button><button class="ib" id="hb"></button>
+   <div class="us"><div class="av">سع</div><div><b>سارة العتيبي</b><small>مديرة الموارد البشرية</small></div></div></div>
+ </header>
+ <main id="main"></main>
+</div>
+</div>
+<dialog id="dlg"><form method="dialog" id="fm"></form></dialog>
+<script>
+const P={
+grid:'<rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/>',
+users:'<circle cx="9" cy="8" r="4"/><path d="M2 21v-1a6 6 0 0 1 12 0v1M16 4a4 4 0 0 1 0 8M22 21v-1a6 6 0 0 0-4-5.6"/>',
+up:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M12 18v-6M9 15l3-3 3 3"/>',
+sl:'<path d="M4 6h10M18 6h2M4 18h2M10 18h10"/><circle cx="16" cy="6" r="2"/><circle cx="8" cy="18" r="2"/>',
+se:'<circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/>',
+be:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.9 1.9 0 0 0 3.4 0"/>',
+gl:'<circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/>',
+tr:'<path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/>',
+he:'<path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7z"/><path d="M3.2 12H9l2-3 3 6 2-3h4.8"/>',
+fi:'<path d="M22 3H2l8 9.5V19l4 2v-8.5z"/>',
+pe:'<path d="M17 3a2.8 2.8 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
+cl:'<path d="M4 14.9A7 7 0 1 1 15.7 8h1.8a4.5 4.5 0 0 1 2.5 8.2M12 12v9M8 16l4-4 4 4"/>',
+ck:'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+sh:'<path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+sv:'<path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7H7v7M7 3v5h8"/>',
+ft:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>'};
+const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${P[n]}</svg>`;
+const $=s=>document.querySelector(s), KEY='hr-dash-v1', SAUDI='السعودية';
+const seed=[
+{id:'EMP-1001',n:'عبدالله القحطاني',nat:SAUDI,job:'مشرف عمليات',co:'شركة مدار للخدمات',iq:null,hc:1,on:1,up:'2026-09-20',nt:''},
+{id:'EMP-1002',n:'محمد خان',nat:'الهند',job:'فني صيانة',co:'شركة مدار للخدمات',iq:'2026-10-04',hc:1,on:1,up:'2026-09-21',nt:''},
+{id:'EMP-1003',n:'يوسف أحمد',nat:'مصر',job:'مشرف سلامة',co:'شركة أفق للمقاولات',iq:'2026-09-29',hc:0,on:1,up:'2026-09-22',nt:''},
+{id:'EMP-1004',n:'سعيد رحمن',nat:'باكستان',job:'عامل مستودع',co:'شركة أفق للمقاولات',iq:'2027-01-18',hc:1,on:1,up:'2026-09-27',nt:''},
+{id:'EMP-1005',n:'نورة الشهري',nat:SAUDI,job:'منسقة موارد بشرية',co:'شركة مدار للخدمات',iq:null,hc:1,on:1,up:'2026-09-23',nt:''},
+{id:'EMP-1006',n:'علي رضا',nat:'بنغلاديش',job:'عامل نظافة',co:'شركة جسور للتشغيل',iq:'2026-09-22',hc:0,on:0,up:'2026-09-24',nt:''}];
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=S||{emps:seed,org:'مجموعة المدار',review:true,remind:true};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const sorted=()=>S.emps.slice().sort((a,b)=>a.n.localeCompare(b.n,'ar'));
+const hj=iso=>new Date(iso).toLocaleDateString('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'});
+const days=iso=>Math.round((new Date(iso)-new Date(new Date().toDateString()))/864e5);
+const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('');
+const near=e=>e.iq&&days(e.iq)<=30, need=e=>near(e)||!e.hc;
+const V=[['ov','نظرة عامة','grid'],['dr','دليل الموظفين','users'],['im','استيراد البيانات','up'],['st','الإعدادات','sl']];
+let view='ov',D={q:'',nat:'',co:'',f:false,sel:null},prev=[];
+
+function overview(){
+ const E=sorted(),n=E.length,fo=E.filter(e=>e.nat!==SAUDI).length,nr=E.filter(near).length,mh=E.filter(e=>!e.hc).length;
+ const m=new Map();E.forEach(e=>m.set(e.nat,(m.get(e.nat)||0)+1));
+ const nats=[...m].sort((a,b)=>b[1]-a[1]),cos=new Set(E.map(e=>e.co)).size;
+ const al=[];E.forEach(e=>{
+  if(near(e))al.push([e.n,'الإقامة تقترب من الانتهاء','تنتهي في '+e.iq.split('-').reverse().join('-'),'#d63a2f','#fbe4e0']);
+  if(!e.hc)al.push([e.n,'الشهادة الصحية غير مكتملة','يرجى رفع الشهادة أو تحديث حالة الملف','#d9784a','#fbe9df'])});
+ const card=(t,i,v,s)=>`<div class="card st"><div class="t"><span>${t}</span><span class="ico">${ic(i,17)}</span></div><div class="n">${v}</div><small>${s}</small></div>`;
+ const d=new Date().toLocaleDateString('ar',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ return `<div class="eb">${d}</div><h1>صباحك أوضح، سارة.</h1><p class="sub">هذه هي الصورة التشغيلية لفريقك اليوم، مع الإشارات التي تستحق انتباهك أولاً.</p>
+ <div class="stats">${card('إجمالي الموظفين','users',n,E.filter(e=>e.on).length+' موظف نشط حالياً')+card('الموظفون الأجانب','gl',fo,'يحتاجون متابعة وثائق الإقامة')+card('إقامات قريبة الانتهاء','tr',nr,'خلال الثلاثين يوماً القادمة')+card('شهادات صحية ناقصة','he',mh,Math.round((n-mh)/n*100)+'% تغطية للشهادات الصحية')}</div>
+ <div class="g2"><div class="card p"><div class="row"><div><h3>توزيع الجنسيات</h3><p class="mu" style="margin-top:6px">تنوع فريق العمل حسب السجلات المعتمدة</p></div><span class="pill">${ic('gl',14)} ${nats.length} جنسية</span></div>
+ ${nats.map(([k,v])=>`<div class="bar"><span>${k}</span><span class="tr"><i style="width:${Math.round(v/n*100)}%"></i></span><span>${Math.round(v/n*100)}%</span></div>`).join('')}</div>
+ <div class="card p ct"><b style="color:var(--pri)">شبكة العقود</b><div class="big">${cos}</div><p class="mu" style="line-height:1.9;padding-bottom:20px;border-bottom:1px solid var(--bd)">شركة متعاقدة تدعم التشغيل. راقب توزيع فريقك بين الشركاء قبل أن يتحول التركّز إلى مخاطرة.</p><div class="row" style="margin-top:20px"><span class="mu">ملفات قيد المعالجة</span><b>${prev.length}</b></div></div></div>
+ <div class="card p"><div class="row"><div><h3>آخر التنبيهات</h3><p class="mu" style="margin-top:6px">قرارات صغيرة الآن تمنع مفاجآت نهاية الشهر</p></div><span style="color:var(--pri)">${ic('ft',26)}</span></div>
+ <div style="margin-top:14px">${al.map(a=>`<div class="al"><div><span class="dot" style="background:${a[4]}"><i style="background:${a[3]}"></i></span><div style="display:block"><b>${a[1]}</b><div class="mu" style="margin-top:4px">${a[2]}</div></div></div><a>${a[0]}</a></div>`).join('')||'<p class="mu" style="padding:20px 0">لا توجد تنبيهات حالياً.</p>'}</div></div>`;
+}
+function rows(){
+ return sorted().filter(e=>(!D.q||(e.n+e.id).toLowerCase().includes(D.q.toLowerCase()))&&(!D.nat||e.nat===D.nat)&&(!D.co||e.co===D.co)&&(!D.f||need(e)));
+}
+function directory(){
+ const A=sorted(),nats=[...new Set(A.map(e=>e.nat))],cos=[...new Set(A.map(e=>e.co))],R=rows();
+ if(!R.find(e=>e.id===D.sel))D.sel=R[0]&&R[0].id;
+ const e=R.find(x=>x.id===D.sel);
+ const opt=(a,v,all)=>`<option value="">${all}</option>`+a.map(x=>`<option${x===v?' selected':''}>${x}</option>`).join('');
+ return `<div class="eb">السجل الرسمي</div><h1>دليل الموظفين</h1><p class="sub">ابحث في ملفات الفريق وراجع حالة الإقامة والشهادات الصحية في مكان واحد.</p>
+ <div class="tools"><label class="sr">${ic('se',18)}<input id="q" placeholder="ابحث بالاسم أو الرقم الوظيفي..." value="${D.q}"></label>
+ <select class="in" id="fn">${opt(nats,D.nat,'كل الجنسيات')}</select><select class="in" id="fc">${opt(cos,D.co,'كل الشركات')}</select>
+ <button class="chip${D.f?' on':''}" id="ff">${ic('fi',18)} يحتاج متابعة</button></div>
+ <div class="md"><div class="card tw"><table><thead><tr><th>الموظف</th><th>الجنسية</th><th>المسمى الوظيفي</th><th>شركة العقد</th><th>الحالة</th></tr></thead><tbody>
+ ${R.map(x=>`<tr data-id="${x.id}" class="${x.id===D.sel?'sel':''}"><td><div class="emp"><span class="ea">${ini(x.n)}</span><span><b>${x.n}</b><small>${x.id}</small></span></div></td><td>${x.nat}</td><td>${x.job}</td><td>${x.co}</td><td>${x.on?'نشط':'غير نشط'}</td></tr>`).join('')||'<tr><td colspan="5" class="mu">لا توجد نتائج مطابقة.</td></tr>'}</tbody></table></div>
+ ${e?`<div class="card p"><div class="dh"><span class="av">${ini(e.n)}</span><div><b>${e.n}</b><span class="mu">${e.job}</span></div><span class="pill">${e.on?'نشط':'غير نشط'}</span></div>
+ <div class="dg"><div><small>الرقم الوظيفي</small><b dir="ltr">${e.id}</b></div><div><small>الجنسية</small><b>${e.nat}</b></div><div><small>شركة العقد</small><b>${e.co}</b></div><div><small>انتهاء الإقامة</small><b>${e.iq?hj(e.iq):'—'}</b></div><div><small>الشهادة الصحية</small><b style="color:${e.hc?'var(--pri)':'#d9784a'}">${e.hc?'مكتملة':'غير مكتملة'}</b></div><div><small>آخر تحديث</small><b>${hj(e.up)}</b></div></div>
+ <small class="mu">ملاحظات الملف</small><div class="nt">${e.nt||'لا توجد ملاحظات مسجلة لهذا الموظف.'}</div><button class="btn" id="ed">${ic('pe',17)} تعديل بيانات الموظف</button></div>`:'<div></div>'}</div>`;
+}
+function imports(){
+ const pv=prev.length?`<h3 style="margin-bottom:6px">المعاينة (${prev.length})</h3><p class="mu">راجع كل صف ثم اعتمد المحدد فقط.</p>`+prev.map((r,i)=>`<label class="pi"><input type="checkbox" data-i="${i}" ${r.ok?'checked':''}><span>${r.n} — ${r.nat} — ${r.job}</span><b class="${r.ok?'hi':'lo'}">${r.ok?'ثقة عالية':'ثقة منخفضة'}</b></label>`).join('')+`<button class="btn pr" id="ap" style="margin-top:16px">اعتماد المحدد</button>`
+ :`<span style="color:var(--pri)">${ic('ck',44)}</span><b>المعاينة ستظهر هنا</b><small>اختر ملفاً لتبدأ مراجعة الحقول والثقة.</small>`;
+ return `<div class="eb">مراجعة قبل الاعتماد</div><h1>استيراد بيانات الموظفين</h1><p class="sub">دع الذكاء الاصطناعي يقرأ المستند، ثم راجع كل قيمة قبل أن تدخل السجل الرسمي.</p>
+ <div class="ig"><div class="card p"><div class="row"><div><h3>ملف المصدر</h3><small class="mu">CSV، PDF أو مستند نصي</small></div><span style="color:var(--pri)">${ic('ft',24)}</span></div>
+ <div class="dz"><div class="ico">${ic('cl',24)}</div><b>اسحب الملف هنا</b><p>أو اختر ملفاً من جهازك. لن يصبح أي سجل رسمياً دون اعتمادك.</p><button class="btn" style="width:auto;margin:auto;padding:0 28px" id="pk">اختيار ملف</button><input type="file" id="fl" accept=".csv,.txt,.pdf" hidden></div>
+ <small class="mu" style="line-height:1.9">نقرأ النص داخل الملف فقط لإعداد معاينة. يمكنك رفض أي قيمة منخفضة الثقة قبل اعتمادها.</small></div>
+ <div class="card p${prev.length?'':' pv'}">${pv}</div></div>`;
+}
+function settings(){
+ const t=(id,a,b,c)=>`<div class="tg"><input type="checkbox" class="sw" id="${id}" ${c?'checked':''}><div><b>${a}</b><small>${b}</small></div></div>`;
+ return `<div class="eb">تهيئة المساحة</div><h1>الإعدادات</h1><p class="sub">ضبط بسيط للهوية والتنبيهات التي تجعل لوحة فريقك أقرب لطريقة عملكم.</p>
+ <div class="card p" style="padding:24px 24px 28px"><div class="sec"><h3>بيانات المؤسسة</h3><p>تظهر هذه المعلومات داخل مساحة العمل ولا تغيّر سجلات الموظفين.</p><label>اسم المؤسسة</label><input class="in" id="org" value="${S.org}"></div>
+ <div class="sec"><h3>الحماية والمراجعة</h3><p>تأكد من أن البيانات المستخرجة تمر دائماً عبر عين بشرية قبل اعتمادها.</p>${t('rv','إلزام مراجعة الاستيراد','تظل الحقول المستخرجة في وضع المعاينة حتى اعتمادها.',S.review)}</div>
+ <div class="sec"><h3>التنبيهات</h3><p>تظهر التنبيهات داخل لوحة النظرة العامة.</p>${t('rm','تذكيرات انتهاء الإقامة والشهادات','تنبيه فريق الموارد البشرية عند اقتراب موعد الوثيقة.',S.remind)}</div>
+ <div class="ft"><span>${ic('sh',20)} التغييرات محفوظة لهذه المساحة فقط</span><button class="btn pr" id="sb">${ic('sv',18)} حفظ التغييرات</button></div></div>`;
+}
+function render(){
+ const v=V.find(x=>x[0]===view);
+ $('#nav').innerHTML=V.map(x=>`<button data-v="${x[0]}" class="${x[0]===view?'on':''}">${ic(x[2])}${x[1]}</button>`).join('');
+ $('#crumb').textContent=v[1];$('#wn').textContent=S.org;$('#wa').textContent=S.org[0]||'م';
+ $('#main').innerHTML={ov:overview,dr:directory,im:imports,st:settings}[view]();
+ bind();
+}
+function bind(){
+ const on=(s,ev,f)=>{const el=$(s);el&&el.addEventListener(ev,f)};
+ if(view==='dr'){
+  on('#q','input',e=>{D.q=e.target.value;render();const i=$('#q');i.focus();i.setSelectionRange(D.q.length,D.q.length)});
+  on('#fn','change',e=>{D.nat=e.target.value;render()});on('#fc','change',e=>{D.co=e.target.value;render()});on('#ff','click',()=>{D.f=!D.f;render()});
+  document.querySelectorAll('tr[data-id]').forEach(r=>r.onclick=()=>{D.sel=r.dataset.id;render()});on('#ed','click',edit);
+ }
+ if(view==='im'){
+  on('#pk','click',()=>$('#fl').click());
+  on('#fl','change',e=>{const f=e.target.files[0];if(!f)return;
+   if(/pdf$/i.test(f.name)){alert('قراءة PDF تحتاج خدمة خلفية. استخدم CSV بالأعمدة: الاسم، الجنسية، المسمى، الشركة، انتهاء الإقامة، الشهادة.');return}
+   f.text().then(t=>{prev=t.split(/\r?\n/).filter(l=>l.trim()).map(l=>l.split(/[,،\t]/).map(c=>c.trim())).filter(c=>c[0]!=='الاسم').map(c=>({n:c[0],nat:c[1]||'',job:c[2]||'',co:c[3]||'',iq:/^\d{4}-\d\d-\d\d$/.test(c[4]||'')?c[4]:null,hc:/^(مكتملة|1|yes)$/i.test(c[5]||'')?1:0,ok:c.length>=6&&!!c[0]&&!!c[1]}));render()})});
+  document.querySelectorAll('.pi input').forEach(c=>c.onchange=()=>{prev[c.dataset.i].ok=c.checked});
+  on('#ap','click',()=>{let k=S.emps.length+1001;prev.filter(r=>r.ok).forEach(r=>S.emps.push({id:'EMP-'+(k++),n:r.n,nat:r.nat,job:r.job,co:r.co,iq:r.iq,hc:r.hc,on:1,up:new Date().toISOString().slice(0,10),nt:''}));prev=[];save();view='dr';render()});
+ }
+ if(view==='st')on('#sb','click',()=>{S.org=$('#org').value.trim()||S.org;S.review=$('#rv').checked;S.remind=$('#rm').checked;save();render();const b=$('#sb');b.textContent='تم الحفظ'});
+}
+function edit(){
+ const e=S.emps.find(x=>x.id===D.sel),f=$('#fm');
+ const fld=(l,k,t='text')=>`<label>${l}</label><input class="in" name="${k}" type="${t}" value="${e[k]||''}">`;
+ f.innerHTML=`<h3>تعديل بيانات الموظف</h3>${fld('الاسم','n')}${fld('الجنسية','nat')}${fld('المسمى الوظيفي','job')}${fld('شركة العقد','co')}${fld('انتهاء الإقامة','iq','date')}
+ <label>الشهادة الصحية</label><select class="in" name="hc"><option value="1"${e.hc?' selected':''}>مكتملة</option><option value="0"${e.hc?'':' selected'}>غير مكتملة</option></select>
+ <label>الحالة</label><select class="in" name="on"><option value="1"${e.on?' selected':''}>نشط</option><option value="0"${e.on?'':' selected'}>غير نشط</option></select>
+ <label>ملاحظات</label><textarea class="in" name="nt">${e.nt||''}</textarea>
+ <div class="row" style="margin-top:18px"><button class="btn" value="x" style="width:48%">إلغاء</button><button class="btn pr" value="ok" style="width:48%;justify-content:center">حفظ</button></div>`;
+ f.onsubmit=ev=>{if(ev.submitter.value!=='ok')return;const d=new FormData(f);
+  Object.assign(e,{n:d.get('n'),nat:d.get('nat'),job:d.get('job'),co:d.get('co'),iq:d.get('iq')||null,hc:+d.get('hc'),on:+d.get('on'),nt:d.get('nt'),up:new Date().toISOString().slice(0,10)});save();setTimeout(render)};
+ $('#dlg').showModal();
+}
+$('#lg').innerHTML=ic('grid',22);$('#hs').innerHTML=ic('se',18);$('#hb').innerHTML=ic('be',18);
+$('#nav').onclick=e=>{const b=e.target.closest('button');if(b){view=b.dataset.v;render();scrollTo(0,0)}};
+$('#hs').onclick=()=>{view='dr';render()};
+render();
+</script>
+</body>
+</html>
