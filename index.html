@@ -7,9 +7,13 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#f7f4ee;--card:#fbfaf7;--bd:#e7e2d8;--ink:#1b2e3d;--mut:#6b7a85;--pri:#38796f;--soft:#e3edeb;--side:#1b2e3d;--side2:#293d4f}
-[data-theme=dark]{--bg:#0e1820;--card:#15232d;--bd:#243645;--ink:#e9eff3;--mut:#93a6b2;--pri:#4fb8a5;--soft:#1c3a38;--side:#0a1218;--side2:#1a2b37;color-scheme:dark}
-[data-theme=dark] .st::after{background:#1f2f3a}[data-theme=dark] .ico,[data-theme=dark] .ea{background:#1f3540}[data-theme=dark] .bar .tr{background:#243645}
-[data-theme=dark] tr.sel td,[data-theme=dark] tr.sel{background:#1a2c37}[data-theme=dark] .nt{background:#1a2c37}[data-theme=dark] .dz{background:#122029;border-color:#3b5a5a}[data-theme=dark] .sw{background:#3a4d5a}
+[data-theme=dark]{--bg:#0a1118;--card:#111d27;--bd:#1f3242;--ink:#f1f5f8;--mut:#9fb2bf;--pri:#45c4ae;--soft:#15332f;--side:#070d12;--side2:#16262f;color-scheme:dark}
+[data-theme=dark] .card{box-shadow:0 10px 30px #0006}[data-theme=dark] aside{border-inline-start:1px solid #1a2a36}
+[data-theme=dark] .st::after{background:#17303a}[data-theme=dark] .ico,[data-theme=dark] .ea{background:#17323a}[data-theme=dark] .bar .tr{background:#1f3242}
+[data-theme=dark] tr.sel td,[data-theme=dark] tr.sel{background:#16303a}[data-theme=dark] .nt{background:#16242f}
+[data-theme=dark] .dz{background:#0f1a23;border-color:#2f5a56}[data-theme=dark] .sw{background:#33495a}
+[data-theme=dark] .btn.pr,[data-theme=dark] .chip.on,[data-theme=dark] .av{color:#062521}[data-theme=dark] .btn.pr{box-shadow:0 8px 20px #45c4ae33}
+.st>*{position:relative;z-index:1}
 .dn{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:16px}.lg2 div{display:flex;align-items:center;gap:8px;margin:7px 0}.lg2 i{width:10px;height:10px;border-radius:3px;flex:none}
 .cb{display:flex;align-items:flex-end;gap:10px;height:150px;margin-top:18px}.cb div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:6px;font-size:12px}.cb i{width:100%;max-width:38px;border-radius:9px 9px 3px 3px;background:var(--pri);min-height:3px}
 .ln{color:var(--pri);cursor:pointer;font-size:13px;background:none;border:0}
@@ -57,7 +61,7 @@ h3{font-size:19px;font-weight:600}.mu{color:var(--mut)}
 .bar{display:flex;align-items:center;gap:14px;margin-top:22px}
 .bar span:first-child{width:90px;font-weight:500}.bar .tr{flex:1;height:7px;border-radius:9px;background:#ece8e1}
 .bar .tr i{display:block;height:100%;background:var(--pri);border-radius:9px}.bar span:last-child{width:34px;color:var(--mut);font-size:13px}
-.ct{background:linear-gradient(180deg,var(--card),#e9f2f0);display:flex;flex-direction:column;justify-content:center}
+.ct{background:linear-gradient(180deg,var(--card),var(--soft));display:flex;flex-direction:column;justify-content:center}
 .ct .big{font-size:96px;font-weight:600;color:var(--pri);line-height:1.1}
 .al{display:flex;align-items:center;justify-content:space-between;padding:18px 0;border-bottom:1px solid var(--bd)}.al:last-child{border:0}
 .al>div{display:flex;align-items:center;gap:12px}.dot{width:26px;height:26px;border-radius:50%;display:grid;place-items:center}
@@ -180,14 +184,14 @@ let view='ov',D={q:'',nat:'',co:'',f:false,sel:null},prev=[];
 const dmy=iso=>iso?iso.split('-').reverse().join('-'):'—';
 const svc=e=>{if(!e.msd)return'—';const m=Math.max(0,Math.floor(-days(e.msd)/30.44)),y=Math.floor(m/12),r=m%12;return(y?y+' سنة':'')+(y&&r?' و ':'')+(r||!y?r+' شهر':'')};
 const probEnd=e=>{if(!e.msd)return null;const d=new Date(e.msd);d.setDate(d.getDate()+90);return d.toISOString().slice(0,10)};
-const greet=()=>new Date().getHours()<12?'صباح الخير':'مساء الخير';
+const greet=(h=new Date().getHours())=>h>=5&&h<12?'صباح الخير':'مساء الخير';
 const PAL=['#38796f','#d9784a','#5b8fb9','#c9a227','#8a6bb0','#d63a2f','#7a8a94'];
 const cnt=(E,f)=>{const m=new Map();E.forEach(e=>{const k=f(e);if(k)m.set(k,(m.get(k)||0)+1)});return[...m].sort((a,b)=>b[1]-a[1])};
 const donut=a=>{const t=a.reduce((x,y)=>x+y[1],0);if(!t)return'<p class="mu" style="padding:20px 0">لا توجد بيانات بعد.</p>';let o=0;const r=42,c=2*Math.PI*r;
  const sg=a.map(([k,v],i)=>{const l=v/t*c,x=`<circle r="${r}" cx="60" cy="60" fill="none" stroke="${PAL[i%7]}" stroke-width="16" stroke-dasharray="${l} ${c-l}" stroke-dashoffset="${-o}" transform="rotate(-90 60 60)"/>`;o+=l;return x}).join('');
  return `<div class="dn"><svg width="130" height="130" viewBox="0 0 120 120">${sg}<text x="60" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="currentColor">${t}</text></svg><div class="lg2">${a.map(([k,v],i)=>`<div><i style="background:${PAL[i%7]}"></i>${k} <b>${v}</b></div>`).join('')}</div></div>`};
 const endBars=E=>{const M=[];for(let i=0;i<6;i++){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+i);M.push([d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),d.toLocaleDateString('ar',{month:'short'}),0])}
- E.forEach(e=>{const m=M.find(x=>e.ce&&e.ce.startsWith(x[0]));if(m)m[2]++});const mx=Math.max(1,...M.map(x=>x[2]));
+ E.forEach(e=>{const m=M.find(x=>e.ce&&e.ce.startsWith(x[0]));if(m)m[2]++});if(!M.some(x=>x[2]))return'<p class="mu" style="padding:26px 0">لا توجد عقود تنتهي خلال الأشهر الستة القادمة.</p>';const mx=Math.max(1,...M.map(x=>x[2]));
  return `<div class="cb">${M.map(x=>`<div><b>${x[2]}</b><i style="height:${Math.round(x[2]/mx*100)}%"></i><span class="mu">${x[1]}</span></div>`).join('')}</div>`};
 const hbars=(a,n)=>a.length?a.map(([k,v])=>`<div class="bar"><span style="width:110px">${k}</span><span class="tr"><i style="width:${Math.round(v/n*100)}%"></i></span><span>${v}</span></div>`).join(''):'<p class="mu" style="padding:20px 0">لا توجد بيانات بعد.</p>';
 const box=(t,sub,h)=>`<div class="card p"><h3>${t}</h3><p class="mu" style="margin-top:6px">${sub}</p>${h}</div>`;
@@ -233,11 +237,11 @@ function directory(){
  <div class="md"><div class="card tw"><table><thead><tr><th>الموظف</th><th>الجنسية</th><th>المسمى الوظيفي</th><th>شركة العقد</th><th>الحالة</th></tr></thead><tbody>
  ${R.map(x=>`<tr data-id="${x.id}" class="${x.id===D.sel?'sel':''}"><td><div class="emp"><span class="ea">${ini(x.n)}</span><span><b>${x.n}</b><small>${x.id}</small></span></div></td><td>${x.nat}</td><td>${x.job}</td><td>${x.co}</td><td>${x.on?'نشط':'غير نشط'}</td></tr>`).join('')||`<tr><td colspan="5" class="mu">${S.emps.length?'لا توجد نتائج مطابقة.':'لا يوجد موظفون بعد. ابدأ من «استيراد البيانات».'}</td></tr>`}</tbody></table></div>
  ${e?`<div class="card p" id="dp"><div class="dh"><span class="av">${ini(e.n)}</span><div><b>${e.n}</b><span class="mu">${e.job}</span></div><span class="pill">${e.on?'نشط':'غير نشط'}</span></div>
- <div class="dg"><div><small>الرقم الوظيفي</small><b dir="ltr">${e.id}</b></div><div><small>الجنسية</small><b>${e.nat}</b></div><div><small>شركة العقد</small><b>${e.co}</b></div><div><small>انتهاء الإقامة</small><b>${e.iq?hj(e.iq):'—'}</b></div><div><small>الشهادة الصحية</small><b style="color:${e.hc?'var(--pri)':'#d9784a'}">${e.hc?'مكتملة':'غير مكتملة'}</b></div><div><small>آخر تحديث</small><b>${hj(e.up)}</b></div><div><small>رقم الهوية</small><b>${e.idn||'—'}</b></div><div><small>نهاية العقد</small><b>${dmy(e.ce)}</b></div><div><small>بداية العقد</small><b>${dmy(e.cs)}</b></div><div><small>رقم العقد</small><b dir="ltr">${e.cn||'—'}</b></div><div><small>مباشرة العمل</small><b>${dmy(e.msd)}</b></div><div><small>مدة الخدمة</small><b>${svc(e)}</b></div><div><small>مدينة العمل</small><b>${e.wc||'—'}</b></div><div><small>الجوال</small><b dir="ltr">${e.ph||'—'}</b></div><div><small>البريد</small><b dir="ltr" style="word-break:break-all">${e.em||'—'}</b></div><div><small>رصيد الإجازة</small><b>${e.al?(e.al-(e.alu||0))+' من '+e.al+' يوم':'—'}</b></div></div>
+ <div class="dg"><div><small>الرقم الوظيفي</small><b dir="ltr">${e.id}</b></div><div><small>الجنسية</small><b>${e.nat}</b></div><div><small>شركة العقد</small><b>${e.co}</b></div><div><small>انتهاء الإقامة</small><b>${e.iq?hj(e.iq):'—'}</b></div><div><small>الشهادة الصحية</small><b style="color:${e.hc?'var(--pri)':'#d9784a'}">${e.hc?'مكتملة':'غير مكتملة'}</b></div><div><small>آخر تحديث</small><b>${hj(e.up)}</b></div><div><small>رقم الهوية</small><b>${e.idn||'—'}</b></div><div><small>نهاية العقد</small><b>${dmy(e.ce)}</b></div><div><small>بداية العقد</small><b>${dmy(e.cs)}</b></div><div><small>رقم العقد</small><b dir="ltr">${e.cn||'—'}</b></div><div><small>مباشرة العمل</small><b>${dmy(e.msd)}</b></div><div><small>مدة الخدمة</small><b>${svc(e)}</b></div><div><small>مدينة العمل</small><b>${e.wc||'—'}</b></div><div><small>الجوال</small><b dir="ltr">${e.ph||'—'}</b></div><div><small>البريد</small><b dir="ltr" style="word-break:break-all">${e.em||'—'}</b></div></div>
  <small class="mu">ملاحظات الملف</small><div class="nt">${e.nt||'لا توجد ملاحظات مسجلة لهذا الموظف.'}</div><button class="btn" id="ed">${ic('pe',17)} تعديل بيانات الموظف</button></div>`:'<div></div>'}</div>`;
 }
 function imports(){
- const one=(x,i)=>{const d=x.d||{};return `<div class="pf"><div class="row"><b>${x.name}</b><span class="${x.st==='ok'?'hi':x.st==='err'?'lo':'mu'}">${x.st==='busy'?'جاري القراءة...':x.st==='ok'?'جاهز للمراجعة':'تعذّرت القراءة'}</span></div>${x.st==='err'?`<p class="lo" style="margin-top:8px">${x.msg}</p>`:''}${x.st==='ok'&&d.cn&&S.emps.some(y=>y.cn===d.cn)?'<p class="lo" style="margin-top:8px">هذا العقد مسجل سابقاً، الاعتماد سيحدّث بيانات الموظف.</p>':''}${x.st==='ok'?[['الاسم','n'],['الجنسية','nat'],['رقم الهوية','idn'],['المسمى الوظيفي','job'],['شركة العقد','co'],['نهاية العقد','ce'],['انتهاء الإقامة','iq'],['رقم العقد','cn'],['مباشرة العمل','msd'],['بداية العقد','cs'],['مدينة العمل','wc'],['الجوال','ph'],['البريد','em'],['الإجازة السنوية (يوم)','al']].map(([l,k])=>`<div class="pi"><span class="mu">${l}</span><b class="${d[k]?'':'lo'}">${d[k]||'غير واضح'}</b></div>`).join('')+`<div class="row" style="margin-top:12px"><button class="btn" data-rj="${i}" style="width:48%">رفض</button><button class="btn pr" data-ap="${i}" style="width:48%;justify-content:center">اعتماد</button></div>`:`<button class="btn" data-rj="${i}" style="margin-top:10px;width:auto;padding:0 16px">إزالة</button>`}</div>`};
+ const one=(x,i)=>{const d=x.d||{};return `<div class="pf"><div class="row"><b>${x.name}</b><span class="${x.st==='ok'?'hi':x.st==='err'?'lo':'mu'}">${x.st==='busy'?'جاري القراءة...':x.st==='ok'?'جاهز للمراجعة':'تعذّرت القراءة'}</span></div>${x.st==='err'?`<p class="lo" style="margin-top:8px">${x.msg}</p>`:''}${x.st==='ok'&&d.cn&&S.emps.some(y=>y.cn===d.cn)?'<p class="lo" style="margin-top:8px">هذا العقد مسجل سابقاً، الاعتماد سيحدّث بيانات الموظف.</p>':''}${x.st==='ok'?[['الاسم','n'],['الجنسية','nat'],['رقم الهوية','idn'],['المسمى الوظيفي','job'],['شركة العقد','co'],['نهاية العقد','ce'],['انتهاء الإقامة','iq'],['رقم العقد','cn'],['مباشرة العمل','msd'],['بداية العقد','cs'],['مدينة العمل','wc'],['الجوال','ph'],['البريد','em']].map(([l,k])=>`<div class="pi"><span class="mu">${l}</span><b class="${d[k]?'':'lo'}">${d[k]||'غير واضح'}</b></div>`).join('')+`<div class="row" style="margin-top:12px"><button class="btn" data-rj="${i}" style="width:48%">رفض</button><button class="btn pr" data-ap="${i}" style="width:48%;justify-content:center">اعتماد</button></div>`:`<button class="btn" data-rj="${i}" style="margin-top:10px;width:auto;padding:0 16px">إزالة</button>`}</div>`};
  const pv=prev.length?`<h3 style="margin-bottom:4px">المعاينة</h3><p class="mu">راجع القيم قبل أن تدخل السجل الرسمي.</p>`+prev.map(one).join('')
  :`<span style="color:var(--pri)">${ic('ck',44)}</span><b>المعاينة ستظهر هنا</b><small>اختر ملفاً لتبدأ مراجعة الحقول والثقة.</small>`;
  return `<div class="eb">مراجعة قبل الاعتماد</div><h1>استيراد بيانات الموظفين</h1><p class="sub">دع الذكاء الاصطناعي يقرأ المستند، ثم راجع كل قيمة قبل أن تدخل السجل الرسمي.</p>
@@ -292,20 +296,20 @@ function approve(i){
  const d=prev[i].d;
  let e=S.emps.find(x=>(d.idn&&x.idn===d.idn)||(d.cn&&x.cn===d.cn)||(!d.idn&&d.n&&x.n===d.n));
  if(!e){e={id:'EMP-'+(1001+S.emps.length),n:'',nat:'',idn:'',job:'',co:'',iq:null,ce:null,hc:0,on:1,nt:''};S.emps.push(e)}
- for(const k of['n','nat','idn','job','co','ce','iq','msd','cs','cn','wc','ph','em','al'])if(d[k])e[k]=d[k];
+ for(const k of['n','nat','idn','job','co','ce','iq','msd','cs','cn','wc','ph','em'])if(d[k])e[k]=d[k];
  if(d.docType==='health')e.hc=1;
  e.up=new Date().toISOString().slice(0,10);prev.splice(i,1);D.sel=e.id;save();view='dr';render();
 }
 function edit(){
  const e=S.emps.find(x=>x.id===D.sel),f=$('#fm');
  const fld=(l,k,t='text')=>`<label>${l}</label><input class="in" name="${k}" type="${t}" value="${e[k]||''}">`;
- f.innerHTML=`<h3>تعديل بيانات الموظف</h3>${fld('الاسم','n')}${fld('الجنسية','nat')}${fld('المسمى الوظيفي','job')}${fld('شركة العقد','co')}${fld('انتهاء الإقامة','iq','date')}${fld('رقم الهوية','idn')}${fld('نهاية العقد','ce','date')}${fld('بداية العقد','cs','date')}${fld('مباشرة العمل','msd','date')}${fld('رقم العقد','cn')}${fld('مدينة العمل','wc')}${fld('الجوال','ph')}${fld('البريد','em')}${fld('الإجازة السنوية (يوم)','al','number')}${fld('أيام الإجازة المستخدمة','alu','number')}
+ f.innerHTML=`<h3>تعديل بيانات الموظف</h3>${fld('الاسم','n')}${fld('الجنسية','nat')}${fld('المسمى الوظيفي','job')}${fld('شركة العقد','co')}${fld('انتهاء الإقامة','iq','date')}${fld('رقم الهوية','idn')}${fld('نهاية العقد','ce','date')}${fld('بداية العقد','cs','date')}${fld('مباشرة العمل','msd','date')}${fld('رقم العقد','cn')}${fld('مدينة العمل','wc')}${fld('الجوال','ph')}${fld('البريد','em')}
  <label>الشهادة الصحية</label><select class="in" name="hc"><option value="1"${e.hc?' selected':''}>مكتملة</option><option value="0"${e.hc?'':' selected'}>غير مكتملة</option></select>
  <label>الحالة</label><select class="in" name="on"><option value="1"${e.on?' selected':''}>نشط</option><option value="0"${e.on?'':' selected'}>غير نشط</option></select>
  <label>ملاحظات</label><textarea class="in" name="nt">${e.nt||''}</textarea>
  <div class="row" style="margin-top:18px"><button class="btn" value="x" style="width:48%">إلغاء</button><button class="btn pr" value="ok" style="width:48%;justify-content:center">حفظ</button></div>`;
  f.onsubmit=ev=>{if(ev.submitter.value!=='ok')return;const d=new FormData(f);
-  Object.assign(e,{n:d.get('n'),nat:d.get('nat'),job:d.get('job'),co:d.get('co'),iq:d.get('iq')||null,idn:d.get('idn'),ce:d.get('ce')||null,cs:d.get('cs')||null,msd:d.get('msd')||null,cn:d.get('cn'),wc:d.get('wc'),ph:d.get('ph'),em:d.get('em'),al:+d.get('al')||0,alu:+d.get('alu')||0,hc:+d.get('hc'),on:+d.get('on'),nt:d.get('nt'),up:new Date().toISOString().slice(0,10)});save();setTimeout(render)};
+  Object.assign(e,{n:d.get('n'),nat:d.get('nat'),job:d.get('job'),co:d.get('co'),iq:d.get('iq')||null,idn:d.get('idn'),ce:d.get('ce')||null,cs:d.get('cs')||null,msd:d.get('msd')||null,cn:d.get('cn'),wc:d.get('wc'),ph:d.get('ph'),em:d.get('em'),hc:+d.get('hc'),on:+d.get('on'),nt:d.get('nt'),up:new Date().toISOString().slice(0,10)});save();setTimeout(render)};
  $('#dlg').showModal();
 }
 $('#lg').innerHTML=ic('grid',22);$('#hs').innerHTML=ic('se',18);$('#hb').innerHTML=ic('be',18);
