@@ -28,8 +28,7 @@ const FIELDS = {
   cn: 'رقم العقد (Contract number)',
   wc: 'مدينة/مكان العمل (Work location) بالعربية',
   ph: 'رقم جوال الموظف (الطرف الثاني) فقط، وليس جوال المنشأة',
-  em: 'البريد الإلكتروني للموظف (الطرف الثاني) فقط، وليس بريد المنشأة',
-  al: 'عدد أيام الإجازة السنوية كرقم فقط'
+  em: 'البريد الإلكتروني للموظف (الطرف الثاني) فقط، وليس بريد المنشأة'
 };
 
 const SCHEMA = {
@@ -58,8 +57,7 @@ function clean(o) {
     cn: s(o.cn) ? String(o.cn).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/\D/g, '') || null : null,
     wc: s(o.wc),
     ph: s(o.ph) ? String(o.ph).replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d)).replace(/[^\d+]/g, '') || null : null,
-    em: s(o.em) ? String(o.em).toLowerCase() : null,
-    al: parseInt(String(o.al || '').replace(/\D/g, ''), 10) || null
+    em: s(o.em) ? String(o.em).toLowerCase() : null
   };
 }
 
