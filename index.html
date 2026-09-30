@@ -141,7 +141,7 @@ tr.sel{background:#eef1f0}tr.sel td{background:none}.dz{padding:22px 14px}
 <div>
  <header>
   <div class="bc">لوحة الموظفين الذكية <span>/</span><b id="crumb"></b></div>
-  <div class="hr"><button class="ib" id="ht" title="الوضع الليلي / النهاري"></button><button class="ib" id="hs"></button><button class="ib" id="hb"></button>
+  <div class="hr"><span id="sy" class="mu" style="font-size:12px;margin-inline-end:6px"></span><button class="ib" id="ht" title="الوضع الليلي / النهاري"></button><button class="ib" id="hs"></button><button class="ib" id="hb"></button>
    <div class="us"><div class="av" id="ua">م</div><div><b id="un"></b><small>الموارد البشرية</small></div></div></div>
  </header>
  <main id="main"></main>
@@ -172,9 +172,25 @@ const $=s=>document.querySelector(s), KEY='hr-dash-v2', SAUDI='السعودية'
 const seed=[];
 let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 S=S||{emps:seed,org:'مجموعة المدار',me:'المشرف',review:true,remind:true};
-const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const lsave=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const getCode=()=>{try{return localStorage.getItem('hr-code')||sessionStorage.getItem('code')||''}catch(e){return''}};
+const setCode=c=>{try{localStorage.setItem('hr-code',c)}catch(e){}try{sessionStorage.setItem('code',c)}catch(e){}};
+let synced=false,pt=0;
+const syncMsg=t=>{const x=$('#sy');if(x)x.textContent=t};
+const api=async(m,body)=>{const go=()=>fetch('/api/data',{method:m,headers:{'Content-Type':'application/json','x-code':getCode()},body:body?JSON.stringify(body):undefined});let r=await go();if(r.status===401){const c=prompt('أدخل رمز الدخول لمزامنة البيانات');if(c){setCode(c);r=await go()}}return r};
+const bad=r=>syncMsg(r.status===503?'المزامنة غير مفعلة':r.status===401?'أدخل رمز الدخول':'تعذّرت المزامنة');
+const push=async()=>{try{syncMsg('جارٍ الحفظ…');const r=await api('PUT',{data:S});if(r.ok)syncMsg('تمت المزامنة ✓');else bad(r)}catch(e){syncMsg('بلا اتصال')}};
+const save=()=>{S.ts=Date.now();lsave();if(synced){clearTimeout(pt);pt=setTimeout(push,700)}};
+const mergeEmps=(a,b)=>{const k=e=>e.idn||e.n,have=new Set(a.map(k));let mx=Math.max(1000,...a.map(e=>parseInt(String(e.id).replace(/\D/g,''))||0));return a.concat(b.filter(e=>!have.has(k(e))).map(e=>a.some(x=>x.id===e.id)?{...e,id:'EMP-'+(++mx)}:e))};
+const pull=async()=>{try{syncMsg('جارٍ المزامنة…');const r=await api('GET');if(!r.ok){bad(r);return}
+ const R=(await r.json()).data;
+ if(!R){S.ts=Date.now();lsave();synced=true;await push()}
+ else if(!S.ts){S={...R,emps:mergeEmps(R.emps||[],S.emps||[]),ts:Date.now()};lsave();synced=true;await push();render()}
+ else if((R.ts||0)>S.ts){S=R;lsave();synced=true;syncMsg('تمت المزامنة ✓');render()}
+ else{synced=true;if(S.ts>(R.ts||0))await push();else syncMsg('تمت المزامنة ✓')}
+}catch(e){syncMsg('بلا اتصال')}};
 const sorted=()=>S.emps.slice().sort((a,b)=>a.n.localeCompare(b.n,'ar'));
-const hj=iso=>new Date(iso).toLocaleDateString('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'});
+const hj=iso=>new Date(iso).toLocaleDateString('ar-u-ca-gregory',{day:'numeric',month:'long',year:'numeric'});
 const days=iso=>Math.round((new Date(iso)-new Date(new Date().toDateString()))/864e5);
 const ini=n=>n.split(' ').slice(0,2).map(w=>w[0]).join('');
 const near=e=>e.iq&&days(e.iq)<=30, need=e=>near(e)||!e.hc;
@@ -190,7 +206,7 @@ const cnt=(E,f)=>{const m=new Map();E.forEach(e=>{const k=f(e);if(k)m.set(k,(m.g
 const donut=a=>{const t=a.reduce((x,y)=>x+y[1],0);if(!t)return'<p class="mu" style="padding:20px 0">لا توجد بيانات بعد.</p>';let o=0;const r=42,c=2*Math.PI*r;
  const sg=a.map(([k,v],i)=>{const l=v/t*c,x=`<circle r="${r}" cx="60" cy="60" fill="none" stroke="${PAL[i%7]}" stroke-width="16" stroke-dasharray="${l} ${c-l}" stroke-dashoffset="${-o}" transform="rotate(-90 60 60)"/>`;o+=l;return x}).join('');
  return `<div class="dn"><svg width="130" height="130" viewBox="0 0 120 120">${sg}<text x="60" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="currentColor">${t}</text></svg><div class="lg2">${a.map(([k,v],i)=>`<div><i style="background:${PAL[i%7]}"></i>${k} <b>${v}</b></div>`).join('')}</div></div>`};
-const endBars=E=>{const M=[];for(let i=0;i<6;i++){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+i);M.push([d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),d.toLocaleDateString('ar',{month:'short'}),0])}
+const endBars=E=>{const M=[];for(let i=0;i<6;i++){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()+i);M.push([d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'),d.toLocaleDateString('ar-u-ca-gregory',{month:'short'}),0])}
  E.forEach(e=>{const m=M.find(x=>e.ce&&e.ce.startsWith(x[0]));if(m)m[2]++});if(!M.some(x=>x[2]))return'<p class="mu" style="padding:26px 0">لا توجد عقود تنتهي خلال الأشهر الستة القادمة.</p>';const mx=Math.max(1,...M.map(x=>x[2]));
  return `<div class="cb">${M.map(x=>`<div><b>${x[2]}</b><i style="height:${Math.round(x[2]/mx*100)}%"></i><span class="mu">${x[1]}</span></div>`).join('')}</div>`};
 const hbars=(a,n)=>a.length?a.map(([k,v])=>`<div class="bar"><span style="width:110px">${k}</span><span class="tr"><i style="width:${Math.round(v/n*100)}%"></i></span><span>${v}</span></div>`).join(''):'<p class="mu" style="padding:20px 0">لا توجد بيانات بعد.</p>';
@@ -212,7 +228,7 @@ function overview(){
   if(e.ce&&days(e.ce)>0&&days(e.ce)-60<=30)al.push([e.n,days(e.ce)>=60?'آخر موعد لإشعار عدم تجديد العقد بعد '+(days(e.ce)-60)+' يوم':'العقد سيتجدد تلقائياً (فات موعد الإشعار)','ينتهي العقد في '+dmy(e.ce),'#c9a227','#f7efd0']);
   const pe=probEnd(e);if(pe&&days(pe)>=0&&days(pe)<=14)al.push([e.n,'فترة التجربة تنتهي قريباً','تنتهي في '+dmy(pe),'#5b8fb9','#e0ecf5'])});
  const card=(t,i,v,s)=>`<div class="card st"><div class="t"><span>${t}</span><span class="ico">${ic(i,17)}</span></div><div class="n">${v}</div><small>${s}</small></div>`;
- const d=new Date().toLocaleDateString('ar',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+ const d=new Date().toLocaleDateString('ar-u-ca-gregory',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
  return `<div class="eb">${d}</div><h1>${greet()}، ${S.me.split(' ')[0]}</h1><p class="sub">هذه هي الصورة التشغيلية لفريقك اليوم، مع الإشارات التي تستحق انتباهك أولاً.</p>${n?'':`<div class="card p" style="margin-bottom:16px"><b>لا يوجد موظفون بعد</b><p class="mu" style="margin:6px 0 12px">ارفع عقداً أو مستنداً من «استيراد البيانات» ليقرأه الذكاء الاصطناعي ويضيف الموظف.</p><button class="btn pr" onclick="view='im';render()">استيراد ملف</button></div>`}
  <div class="stats">${card('إجمالي الموظفين','users',n,E.filter(e=>e.on).length+' موظف نشط حالياً')+card('الموظفون الأجانب','gl',fo,'يحتاجون متابعة وثائق الإقامة')+card('إقامات قريبة الانتهاء','tr',nr,'خلال الثلاثين يوماً القادمة')+card('شهادات صحية ناقصة','he',mh,(n?Math.round((n-mh)/n*100):0)+'% تغطية للشهادات الصحية')}</div>
  <div class="g2"><div class="card p"><div class="row"><div><h3>توزيع الجنسيات</h3><p class="mu" style="margin-top:6px">تنوع فريق العمل حسب السجلات المعتمدة</p></div><span class="pill">${ic('gl',14)} ${nats.length} جنسية</span></div>
@@ -285,9 +301,9 @@ function run(f){
  if(f.size>3e6){x.st='err';x.msg='الملف أكبر من 3 ميجا.';return render()}
  const r=new FileReader();
  r.onload=async()=>{try{
-  const call=()=>fetch('/api/extract',{method:'POST',headers:{'Content-Type':'application/json','x-code':sessionStorage.getItem('code')||''},body:JSON.stringify({mime:f.type||'application/pdf',data:r.result.split(',')[1]})});
+  const call=()=>fetch('/api/extract',{method:'POST',headers:{'Content-Type':'application/json','x-code':getCode()},body:JSON.stringify({mime:f.type||'application/pdf',data:r.result.split(',')[1]})});
   let a=await call();
-  if(a.status===401){const c=prompt('أدخل رمز الدخول');if(c){sessionStorage.setItem('code',c);a=await call()}}
+  if(a.status===401){const c=prompt('أدخل رمز الدخول');if(c){setCode(c);a=await call()}}
   const j=await a.json();if(!a.ok)throw new Error(j.error||'خطأ غير معروف');x.d=j;x.st='ok'}catch(e){x.st='err';x.msg=e.message}
   render()};
  r.readAsDataURL(f);
@@ -295,7 +311,7 @@ function run(f){
 function approve(i){
  const d=prev[i].d;
  let e=S.emps.find(x=>(d.idn&&x.idn===d.idn)||(d.cn&&x.cn===d.cn)||(!d.idn&&d.n&&x.n===d.n));
- if(!e){e={id:'EMP-'+(1001+S.emps.length),n:'',nat:'',idn:'',job:'',co:'',iq:null,ce:null,hc:0,on:1,nt:''};S.emps.push(e)}
+ if(!e){e={id:'EMP-'+(Math.max(1000,...S.emps.map(x=>parseInt(String(x.id).replace(/\D/g,''))||0))+1),n:'',nat:'',idn:'',job:'',co:'',iq:null,ce:null,hc:0,on:1,nt:''};S.emps.push(e)}
  for(const k of['n','nat','idn','job','co','ce','iq','msd','cs','cn','wc','ph','em'])if(d[k])e[k]=d[k];
  if(d.docType==='health')e.hc=1;
  e.up=new Date().toISOString().slice(0,10);prev.splice(i,1);D.sel=e.id;save();view='dr';render();
@@ -320,6 +336,7 @@ const setTheme=t=>{document.documentElement.dataset.theme=t;$('#ht').innerHTML=i
 $('#ht').onclick=()=>{const t=curTheme()==='dark'?'light':'dark';try{localStorage.setItem(TK,t)}catch(e){}setTheme(t)};
 setTheme(curTheme());
 render();
+pull();document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&synced)pull()});
 </script>
 </body>
 </html>
